@@ -41,9 +41,13 @@ export function PromptWorkbench() {
 
       setRefined(data.refined_prompt);
 
-    } catch (err: any) {
+    } catch (err) {
       console.error("API call failed:", err);
-      setError(`Error: ${err.message}`);
+      if (err instanceof Error){
+        setError(`Error: ${err.message}`);
+      } else {
+        setError("An unknown error occured.")
+      }
     } finally {
       setBusy(false)
     }
