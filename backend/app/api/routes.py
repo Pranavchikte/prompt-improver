@@ -4,7 +4,6 @@ from flask import request, jsonify
 from . import api_bp
 from config import Config
 
-# --- Gemini Model Configuration ---
 try:
     if not Config.GEMINI_API_KEY:
         raise ValueError("Gemini API key not found. Please set the GEMINI_API_KEY environment variable.")
@@ -25,7 +24,6 @@ except Exception as e:
     model = None
     print(f"🔴 Critical Error: Failed to initialize Gemini model: {e}")
 
-# --- System Prompt: The AI's Core Instructions ---
 SYSTEM_PROMPT = """
 You are an expert prompt engineering assistant named 'Refiner'. 
 Your sole purpose is to take a user's raw prompt and refine it into a clear, structured, and highly effective prompt for Large Language Models.
@@ -44,7 +42,6 @@ def refine_prompt_route():
     if model is None:
         return jsonify({"error": "Model is not configured. Check server logs."}), 500
 
-    # 1. Get and validate the incoming data
     data = request.get_json()
     if not data or "prompt" not in data or not data["prompt"].strip():
         return jsonify({"error": "The 'prompt' field is required and cannot be empty."}), 400
@@ -52,13 +49,10 @@ def refine_prompt_route():
     original_prompt = data["prompt"]
 
     try:
-        # 2. Construct the full prompt for the model
         full_prompt = [SYSTEM_PROMPT, "---", "User's raw prompt:", original_prompt]
         
-        # 3. Call the Gemini API
         response = model.generate_content(full_prompt)
         
-        # 4. Clean and return the response
         refined_text = response.text.strip()
         
         return jsonify({"refined_prompt": refined_text})
